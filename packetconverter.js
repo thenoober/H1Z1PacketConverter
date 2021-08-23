@@ -106,7 +106,7 @@ packet.then(async value=>{
     }
     if(bitflagFieldFound){
         //generate bitflag class
-        value += "public class Flags{bool bit0{get;set;}bool bit1{get;set;}bool bit2{get;set;}bool bit3{get;set;}bool bit4{get;set;}bool bit5{get;set;}bool bit6{get;set;}bool bit7{get;set;}}";
+        value += "public class Flags{[BsonElement(\"bit0\")][Schema.Field]bool bit0{get;set;}[BsonElement(\"bit1\")][Schema.Field]bool bit1{get;set;}[BsonElement(\"bit2\")][Schema.Field]bool bit2{get;set;}[BsonElement(\"bit3\")][Schema.Field]bool bit3{get;set;}[BsonElement(\"bit4\")][Schema.Field]bool bit4{get;set;}[BsonElement(\"bit5\")][Schema.Field]bool bit5{get;set;}[BsonElement(\"bit6\")][Schema.Field]bool bit6{get;set;}[BsonElement(\"required\")][Schema.Field]bool required{get;set;}}";
     }
     fs.writeFile('./converted/Class_' + packeToConvert.name +'.cs', value, function (err) {
         if (err) return console.log(err);
