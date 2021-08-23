@@ -82,7 +82,7 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
             if(schema[i].type === 'bitflags'){
                 scriptBuilder += "[Schema.Field]"; 
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public " + capitalizeFirstLetter(schema[i].name) + "[] " + schema[i].name + " { get;set;}"
+                scriptBuilder += "public " + capitalizeFirstLetter(schema[i].name) + schema[i].name + " { get;set;}"
                 bitflagFieldFound = true;
                 continue;
             }
