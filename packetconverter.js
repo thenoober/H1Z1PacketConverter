@@ -31,7 +31,7 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
             if(schema[i].type === 'boolean'){
                 scriptBuilder += "[Schema.Field]"; 
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public boolean " + schema[i].name + " { get;set;}";
+                scriptBuilder += "public bool " + schema[i].name + " { get;set;}";
                 continue;
             }
             if(schema[i].type === 'uint8'){
