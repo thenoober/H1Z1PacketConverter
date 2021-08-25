@@ -58,24 +58,54 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
                 scriptBuilder += "public ulong " + schema[i].name + " { get;set;}"
                 continue;
             }
+            if(schema[i].type === 'float'){
+                scriptBuilder += "[Schema.Field]"; 
+                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                scriptBuilder += "public float " + schema[i].name + " { get;set;}"
+                continue;
+            }
+            if(schema[i].type === 'double'){
+                scriptBuilder += "[Schema.Field]"; 
+                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                scriptBuilder += "public double " + schema[i].name + " { get;set;}"
+                continue;
+            }
             if(schema[i].type === 'byteswithlength'){
-                scriptBuilder += "[Schema.Fields]"; 
+                scriptBuilder += "[Schema.ObjectField(\"BytesWithlength\")]"; 
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
                 scriptBuilder += "public "+ capitalizeFirstLetter(schema[i].name) + " " + schema[i].name + " { get;set;}"
                 subClasses.push(processSchema(capitalizeFirstLetter(schema[i].name), schema[i].fields, "", subClasses));
                 continue;
             }
             if(schema[i].type === 'schema'){
-                scriptBuilder += "[Schema.Fields]"; 
+                scriptBuilder += "[Schema.ObjectField(\"Object\")]"; 
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
                 scriptBuilder += "public "+ capitalizeFirstLetter(schema[i].name) + " " + schema[i].name + " { get;set;}"
                 subClasses.push(processSchema(capitalizeFirstLetter(schema[i].name), schema[i].fields, "", subClasses));
                 continue;
             }
             if(schema[i].type === 'array'){
-                scriptBuilder += "[Schema.Field]"; 
+                var arrayType = "";
+                var propertyType = "";
+                if(schema[i].elementType){
+                    if(schema[i].elementType == "uint8"){
+                        arrayType = "Uint8";
+                        propertyType = "byte"
+                    }else if(schema[i].elementType == "uint16"){
+                        arrayType = "Uint16";
+                        propertyType = "ushort";
+                    }else if(schema[i].elementType == "uint32"){
+                        arrayType = "uint";
+                    }
+                }else{
+                    arrayType = "Object";
+                    propertyType = capitalizeFirstLetter(schema[i].name);
+                }
+
+                scriptBuilder += "[Schema.ArrayField(\""+ arrayType +"\")]"; 
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public " + capitalizeFirstLetter(schema[i].name) + "[] " + schema[i].name + " { get;set;}"
+
+                scriptBuilder += "public " + propertyType + "[] " + schema[i].name + " { get;set;}"
                 subClasses.push(processSchema(capitalizeFirstLetter(schema[i].name), schema[i].fields, "", subClasses));
                 continue;
             }
