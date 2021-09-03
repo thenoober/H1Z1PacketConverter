@@ -247,20 +247,14 @@ const packets = [
                                             type: "array",
                                             fields: [
                                                 { name: "slotId", type: "uint32" },
-                                                {
-                                                    name: "loadoutSlotData",
-                                                    type: "schema",
+                                                { name: "loadoutSlotData", type: "schema",
                                                     fields: [
                                                         { name: "index", type: "uint32" },
-                                                        {
-                                                            name: "unknownData1",
-                                                            type: "schema",
+                                                        { name: "unknownData1", type: "schema",
                                                             fields: [
                                                                 { name: "itemLineId", type: "uint32" },
                                                                 { name: "flags", type: "uint8" },
-                                                                {
-                                                                    name: "attachments",
-                                                                    type: "array",
+                                                                { name: "attachments", type: "array",
                                                                     fields: [
                                                                         { name: "attachmentId", type: "uint32" },
                                                                     ],
@@ -351,8 +345,7 @@ const packets = [
                                     type: "array",
                                     fields: [
                                         { name: "attachmentId", type: "uint32" },
-                                        {
-                                            name: "attachmentData",
+                                        { name: "attachmentData",
                                             type: "schema",
                                             fields: [
                                                 { name: "attachmentId", type: "uint32" },

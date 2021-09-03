@@ -1,6 +1,6 @@
 var fs = require("fs");
 
-var loginPacket = require("./packets/loginpackets").packets;
+var loginPacket = require("./packets/h1z1packets").Packets;
 
 //set to true if the class will load data from mongodb
 var generateBsonAttribute = true;
@@ -9,7 +9,7 @@ var generateBsonAttribute = true;
 var bitflagFieldFound = false;
 
 //set the packets opcode that you wish to convert
-var packeToConvert = loginPacket.Packets[0X0c];
+var packeToConvert = loginPacket[0x03];
 
 
 var subClasses = new Array();
@@ -71,7 +71,7 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
                 continue;
             }
             if(schema[i].type === 'byteswithlength'){
-                scriptBuilder += "[Schema.ObjectField(\"BytesWithlength\")]"; 
+                scriptBuilder += "[Schema.ObjectField(\"BytesWithLength\")]"; 
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
                 scriptBuilder += "public "+ capitalizeFirstLetter(schema[i].name) + " " + schema[i].name + " { get;set;}"
                 subClasses.push(processSchema(capitalizeFirstLetter(schema[i].name), schema[i].fields, "", subClasses));
