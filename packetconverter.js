@@ -52,6 +52,12 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
                 scriptBuilder += "public uint " + schema[i].name + " { get;set;}";
                 continue;
             }
+            if(schema[i].type === 'int32'){
+                scriptBuilder += "[Schema.Field]"; 
+                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                scriptBuilder += "public int " + schema[i].name + " { get;set;}";
+                continue;
+            }
             if(schema[i].type === 'uint64'){
                 scriptBuilder += "[Schema.Field]"; 
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
@@ -70,6 +76,12 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
                 scriptBuilder += "public double " + schema[i].name + " { get;set;}"
                 continue;
             }
+            if(schema[i].type === 'floatvector3' || schema[i].type === 'floatvector4'){
+                scriptBuilder += "[Schema.ArrayField(\"Float\")]"; 
+                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                scriptBuilder += "public float[] " + schema[i].name + " { get;set;}"
+                continue;
+            }
             if(schema[i].type === 'byteswithlength'){
                 scriptBuilder += "[Schema.ObjectField(\"BytesWithLength\")]"; 
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
@@ -82,6 +94,12 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
                 scriptBuilder += "public "+ capitalizeFirstLetter(schema[i].name) + " " + schema[i].name + " { get;set;}"
                 subClasses.push(processSchema(capitalizeFirstLetter(schema[i].name), schema[i].fields, "", subClasses));
+                continue;
+            }
+            if(schema[i].type === 'unsignedIntWith2bitLength'){
+                scriptBuilder += "[Schema.ObjectField(\"UnsignedIntWith2bitLength\")]"; 
+                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                scriptBuilder += "public byte[] " + schema[i].name + " { get;set;}"
                 continue;
             }
             if(schema[i].type === 'array'){
@@ -110,7 +128,7 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
                 continue;
             }
             if(schema[i].type === 'bitflags'){
-                scriptBuilder += "[Schema.Field]"; 
+                scriptBuilder += "[Schema.ObjectField(\"Flags\")]"; 
                 scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
                 scriptBuilder += "public " + capitalizeFirstLetter(schema[i].name) + schema[i].name + " { get;set;}"
                 bitflagFieldFound = true;

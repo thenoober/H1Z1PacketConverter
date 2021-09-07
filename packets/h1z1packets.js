@@ -770,7 +770,7 @@ const lightWeightPcSchema = [
     { name: "guid", type: "uint64", defaultValue: "0" },
     {
         name: "transientId",
-        type: "UnsignedIntWith2bitLength",
+        type: "unsignedIntWith2bitLength",
        
     },
     {
@@ -810,7 +810,7 @@ const lightWeightNpcSchema = [
     },
     {
         name: "transientId",
-        type: "UnsignedIntWith2bitLength",
+        type: "unsignedIntWith2bitLength",
     },
     { name: "unknownString1", type: "string", defaultValue: "" },
     { name: "nameId", type: "uint32", defaultValue: 0 },
@@ -2010,7 +2010,7 @@ const packets = [
                         { name: "characterId", type: "uint64", defaultValue: "" },
                         {
                             name: "transientId",
-                            type: "UnsignedIntWith2bitLength",
+                            type: "unsignedIntWith2bitLength",
                            
                         },
                         { name: "lastLoginDate", type: "uint64", defaultValue: "" },
