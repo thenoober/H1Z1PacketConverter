@@ -3243,7 +3243,7 @@ const packets = [
                                             defaultValue: "",
                                         },
                                         {
-                                            name: "unknownString1",
+                                            name: "unknownString2",
                                             type: "string",
                                             defaultValue: "",
                                         },

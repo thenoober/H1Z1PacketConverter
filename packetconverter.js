@@ -18,91 +18,124 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-async function processSchema(name, schema, scriptBuilder, subClasses) {
-    scriptBuilder = "public class " + name + "{";
+function classNameExist(listOfClasses, name){
+    if(listOfClasses.length <= 0){
+        return false;
+    }
+    for(var i = 0;i < listOfClasses.length;i++){
+        if(listOfClasses[i] == name){
+            return true;
+        }
+    }
+    return false;
+}
+
+async function processSchema(name, schema, classProperties, subClasses) {
+    let classShell = "public class " + name + "{";
     if(schema){
         for(var i = 0; i < schema.length;i++){
             if(schema[i].type === 'string'){
-                scriptBuilder += "[Schema.Field]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public string " + schema[i].name + " { get;set;}";
+                classProperties += "[Schema.Field]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public string " + schema[i].name + " { get;set;}";
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'boolean'){
-                scriptBuilder += "[Schema.Field]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public bool " + schema[i].name + " { get;set;}";
+                classProperties += "[Schema.Field]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public bool " + schema[i].name + " { get;set;}";
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'uint8'){
-                scriptBuilder += "[Schema.Field]";
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public byte " + schema[i].name + " { get;set;}";
+                classProperties += "[Schema.Field]";
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public byte " + schema[i].name + " { get;set;}";
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'uint16'){
-                scriptBuilder += "[Schema.Field]";
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public ushort " + schema[i].name + " { get;set;}";
+                classProperties += "[Schema.Field]";
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public ushort " + schema[i].name + " { get;set;}";
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'uint32'){
-                scriptBuilder += "[Schema.Field]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public uint " + schema[i].name + " { get;set;}";
+                classProperties += "[Schema.Field]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public uint " + schema[i].name + " { get;set;}";
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'int32'){
-                scriptBuilder += "[Schema.Field]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public int " + schema[i].name + " { get;set;}";
+                classProperties += "[Schema.Field]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public int " + schema[i].name + " { get;set;}";
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'uint64'){
-                scriptBuilder += "[Schema.Field]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public ulong " + schema[i].name + " { get;set;}"
+                classProperties += "[Schema.Field]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public ulong " + schema[i].name + " { get;set;}"
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'float'){
-                scriptBuilder += "[Schema.Field]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public float " + schema[i].name + " { get;set;}"
+                classProperties += "[Schema.Field]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public float " + schema[i].name + " { get;set;}"
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'double'){
-                scriptBuilder += "[Schema.Field]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public double " + schema[i].name + " { get;set;}"
+                classProperties += "[Schema.Field]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public double " + schema[i].name + " { get;set;}"
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'floatvector3' || schema[i].type === 'floatvector4'){
-                scriptBuilder += "[Schema.ArrayField(\"Float\")]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public float[] " + schema[i].name + " { get;set;}"
+                classProperties += "[Schema.ArrayField(\"Float\")]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public float[] " + schema[i].name + " { get;set;}"
+                classProperties += (schema[i].defaultValue)? " = " + schema[i].defaultValue + ";" : "";
                 continue;
             }
             if(schema[i].type === 'byteswithlength'){
-                scriptBuilder += "[Schema.ObjectField(\"BytesWithLength\")]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public "+ capitalizeFirstLetter(schema[i].name) + " " + schema[i].name + " { get;set;}"
-                subClasses.push(processSchema(capitalizeFirstLetter(schema[i].name), schema[i].fields, "", subClasses));
+                let subClassName = capitalizeFirstLetter(schema[i].name);
+                classProperties += "[Schema.ObjectField(\"BytesWithLength\")]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public "+ subClassName + " " + schema[i].name + " { get;set;}"
+                if(subClassName == name){
+                    classShell += await processSchema(subClassName + "_0", schema[i].fields, "", subClasses);
+                }else{
+                    classShell += await processSchema(subClassName, schema[i].fields, "", subClasses);
+                }
                 continue;
             }
             if(schema[i].type === 'schema'){
-                scriptBuilder += "[Schema.ObjectField(\"Object\")]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public "+ capitalizeFirstLetter(schema[i].name) + " " + schema[i].name + " { get;set;}"
-                subClasses.push(processSchema(capitalizeFirstLetter(schema[i].name), schema[i].fields, "", subClasses));
+                let subClassName = capitalizeFirstLetter(schema[i].name);
+                classProperties += "[Schema.ObjectField(\"Object\")]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public "+ capitalizeFirstLetter(schema[i].name) + " " + schema[i].name + " { get;set;}"
+                if(subClassName == name){
+                    classShell += await processSchema(subClassName + "_0", schema[i].fields, "", subClasses);
+                }else{
+                    classShell += await processSchema(subClassName, schema[i].fields, "", subClasses);
+                }
                 continue;
             }
             if(schema[i].type === 'unsignedIntWith2bitLength'){
-                scriptBuilder += "[Schema.ObjectField(\"UnsignedIntWith2bitLength\")]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public byte[] " + schema[i].name + " { get;set;}"
+                classProperties += "[Schema.ObjectField(\"UnsignedIntWith2bitLength\")]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "public byte[] " + schema[i].name + " { get;set;}"
                 continue;
             }
             if(schema[i].type === 'array'){
+                let subClassName = capitalizeFirstLetter(schema[i].name);
                 var arrayType = "";
                 var propertyType = "";
                 if(schema[i].elementType){
@@ -117,20 +150,29 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
                     }
                 }else{
                     arrayType = "Object";
-                    propertyType = capitalizeFirstLetter(schema[i].name);
+                    propertyType = subClassName;
                 }
 
-                scriptBuilder += "[Schema.ArrayField(\""+ arrayType +"\")]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                classProperties += "[Schema.ArrayField(\""+ arrayType +"\")]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
 
-                scriptBuilder += "public " + propertyType + "[] " + schema[i].name + " { get;set;}"
-                subClasses.push(processSchema(capitalizeFirstLetter(schema[i].name), schema[i].fields, "", subClasses));
+                classProperties += "public " + propertyType + "[] " + schema[i].name + " { get;set;}"
+                if(subClassName == name){
+                    classShell += await processSchema(subClassName + "_0", schema[i].fields, "", subClasses);
+                }else{
+                    classShell += await processSchema(subClassName, schema[i].fields, "", subClasses);
+                }
                 continue;
             }
             if(schema[i].type === 'bitflags'){
-                scriptBuilder += "[Schema.ObjectField(\"Flags\")]"; 
-                scriptBuilder += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
-                scriptBuilder += "public " + capitalizeFirstLetter(schema[i].name) + schema[i].name + " { get;set;}"
+                let subClassName = capitalizeFirstLetter(schema[i].name);
+                classProperties += "[Schema.ObjectField(\"Flags\")]"; 
+                classProperties += (generateBsonAttribute)? "[BsonElement(\"" + schema[i].name + "\")]" : ""; 
+                if(subClassName == name){
+                    classShell += await processSchema(subClassName + "_0", schema[i].fields, "", subClasses);
+                }else{
+                    classShell += await processSchema(subClassName, schema[i].fields, "", subClasses);
+                }
                 bitflagFieldFound = true;
                 continue;
             }
@@ -141,17 +183,17 @@ async function processSchema(name, schema, scriptBuilder, subClasses) {
         console.log("Schema has no known fields: " + name);
     }
 
-    
-    scriptBuilder += "}";
-    return scriptBuilder;
+    classShell += classProperties;
+    classShell += "}";
+    return classShell;
 };
 
 var packet = processSchema(packeToConvert.name, packeToConvert.schema, "", subClasses);
 
 packet.then(async value=>{
-    for(var j = 0;j < subClasses.length;j++){
-        value += await subClasses[j];
-    }
+    //for(var j = 0;j < subClasses.length;j++){
+    //    value += await subClasses[j];
+   // }
     if(bitflagFieldFound){
         //generate bitflag class
         value += "public class Flags{[BsonElement(\"bit0\")][Schema.Field]bool bit0{get;set;}[BsonElement(\"bit1\")][Schema.Field]bool bit1{get;set;}[BsonElement(\"bit2\")][Schema.Field]bool bit2{get;set;}[BsonElement(\"bit3\")][Schema.Field]bool bit3{get;set;}[BsonElement(\"bit4\")][Schema.Field]bool bit4{get;set;}[BsonElement(\"bit5\")][Schema.Field]bool bit5{get;set;}[BsonElement(\"bit6\")][Schema.Field]bool bit6{get;set;}[BsonElement(\"required\")][Schema.Field]bool required{get;set;}}";
